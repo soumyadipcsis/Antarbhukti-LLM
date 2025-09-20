@@ -1,0 +1,12 @@
+steps = [
+{"name": "Green", "function": "SetGreen"},
+{"name": "Yellow", "function": "SetYellow"},
+{"name": "Red", "function": "SetRed"}
+]
+transitions = [
+{"src": "Green", "tgt": "Yellow", "guard": "greenTimeElapsed == true"},
+{"src": "Yellow", "tgt": "Red", "guard": "yellowTimeElapsed == true"},
+{"src": "Red", "tgt": "Green", "guard": "redTimeElapsed == true"}
+]
+variables = ["greenTimeElapsed", "yellowTimeElapsed", "redTimeElapsed"]
+initial_step = "Green"

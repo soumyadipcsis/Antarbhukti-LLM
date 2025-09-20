@@ -1,0 +1,25 @@
+steps = [
+{"name": "WaitVehicle", "function": "DetectVehicle"},
+{"name": "SafetyCheckInput", "function": "ValidateSensors"},
+{"name": "OpenGate", "function": "RaiseGate"},
+{"name": "WaitPass", "function": "MonitorPass"},
+{"name": "CloseGate", "function": "LowerGate"},
+{"name": "TimeoutSafeStop", "function": "HaltGateMovementSafely"},
+{"name": "SafetyLog", "function": "RecordGateEvent"},
+{"name": "SafetyError", "function": "StopAndLogError"}
+]
+transitions = [
+{"src": "WaitVehicle", "tgt": "SafetyCheckInput", "guard": "vehicle_detected == 'True'"},
+{"src": "SafetyCheckInput", "tgt": "OpenGate", "guard": "sensorsOK == 'True'"},
+{"src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "not (sensorsOK == 'True')"},
+{"src": "OpenGate", "tgt": "TimeoutSafeStop", "guard": "open_timeout_counter > MAX_OPEN_DURATION or watchdog_triggered == 'True'"},
+{"src": "OpenGate", "tgt": "WaitPass", "guard": "gate_opened == 'True' and open_timeout_counter <= MAX_OPEN_DURATION"},
+{"src": "WaitPass", "tgt": "CloseGate", "guard": "vehicle_passed == 'True'"},
+{"src": "CloseGate", "tgt": "TimeoutSafeStop", "guard": "close_timeout_counter > MAX_CLOSE_DURATION or watchdog_triggered == 'True'"},
+{"src": "CloseGate", "tgt": "SafetyLog", "guard": "gate_closed == 'True' and close_timeout_counter <= MAX_CLOSE_DURATION"},
+{"src": "TimeoutSafeStop", "tgt": "SafetyLog", "guard": "'True'"},
+{"src": "SafetyLog", "tgt": "WaitVehicle", "guard": "'True'"},
+{"src": "SafetyError", "tgt": "SafetyLog", "guard": "'True'"}
+]
+variables = ["vehicle_detected","sensorsOK","gate_opened","vehicle_passed","gate_closed","open_timeout_counter","close_timeout_counter","MAX_OPEN_DURATION","MAX_CLOSE_DURATION","watchdog_triggered"]
+initial_step = "WaitVehicle"

@@ -1,0 +1,25 @@
+steps = [
+{ "name": "Init", "function": "InitializeBoiler" },
+{ "name": "HeatWater", "function": "StartHeater" },
+{ "name": "CheckPressure", "function": "ReadPressureSensor" },
+{ "name": "Regulate", "function": "AdjustValve" },
+{ "name": "SafetyLog", "function": "RecordSafetyState" },
+{ "name": "EmergencyStop", "function": "EmergencyShutdown" },
+{ "name": "TimeoutSafeStop", "function": "TimeoutShutdown" },
+{ "name": "Shutdown", "function": "TurnOffBoiler" }
+]
+transitions = [
+{ "src": "Init", "tgt": "HeatWater", "guard": "init_done" },
+{ "src": "HeatWater", "tgt": "CheckPressure", "guard": "temp_threshold_reached" },
+{ "src": "CheckPressure", "tgt": "Regulate", "guard": "pressure_not_ok" },
+{ "src": "Regulate", "tgt": "SafetyLog", "guard": "adjustment_done" },
+{ "src": "SafetyLog", "tgt": "CheckPressure", "guard": "safety_log_completed" },
+{ "src": "CheckPressure", "tgt": "Shutdown", "guard": "pressure_ok" },
+{ "src": "HeatWater", "tgt": "EmergencyStop", "guard": "overtemp_detected" },
+{ "src": "CheckPressure", "tgt": "EmergencyStop", "guard": "overpressure_detected" },
+{ "src": "Regulate", "tgt": "TimeoutSafeStop", "guard": "regulate_timeout" },
+{ "src": "EmergencyStop", "tgt": "Shutdown", "guard": "emergency_resolved" },
+{ "src": "TimeoutSafeStop", "tgt": "Shutdown", "guard": "timeout_resolved" }
+]
+variables = [ init_done, temp_threshold_reached, pressure_not_ok, adjustment_done, pressure_ok, safety_log_completed, overtemp_detected, overpressure_detected, regulate_timeout, emergency_resolved, timeout_resolved, pressure_value, temperature_value, valve_position, safety_margin_ok ]
+initial_step = Init

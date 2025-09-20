@@ -1,0 +1,14 @@
+steps = [
+{"name": "WaitVehicle", "function": "DetectVehicle"},
+{"name": "OpenGate", "function": "RaiseGate"},
+{"name": "WaitPass", "function": "MonitorPass"},
+{"name": "CloseGate", "function": "LowerGate"}
+]
+transitions = [
+{"src": "WaitVehicle", "tgt": "OpenGate", "guard": "vehicle_detected"},
+{"src": "OpenGate", "tgt": "WaitPass", "guard": "gate_opened"},
+{"src": "WaitPass", "tgt": "CloseGate", "guard": "vehicle_passed"},
+{"src": "CloseGate", "tgt": "WaitVehicle", "guard": "gate_closed"}
+]
+variables = ["vehicle_detected", "gate_opened", "vehicle_passed", "gate_closed"]
+initial_step = "WaitVehicle"

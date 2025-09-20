@@ -1,0 +1,17 @@
+steps = [
+{ "name": "MonitorWindSpeed", "function": "ReadWindSensor" },
+{ "name": "AdjustBlades", "function": "SetBladeAngle" },
+{ "name": "GeneratePower", "function": "StartGenerator" },
+{ "name": "TimeoutSafeStop", "function": "HaltTurbineSafely" },
+{ "name": "SafetyLog", "function": "RecordTurbineEvent" }
+]
+transitions = [
+{ "src": "MonitorWindSpeed", "tgt": "AdjustBlades", "guard": "windSpeed > threshold" },
+{ "src": "AdjustBlades", "tgt": "GeneratePower", "guard": "True" },
+{ "src": "GeneratePower", "tgt": "TimeoutSafeStop", "guard": "rotor_cycle_counter > MAX_ROTOR_CYCLES or watchdog_triggered == True" },
+{ "src": "GeneratePower", "tgt": "MonitorWindSpeed", "guard": "rotor_cycle_counter <= MAX_ROTOR_CYCLES" },
+{ "src": "TimeoutSafeStop", "tgt": "SafetyLog", "guard": "True" },
+{ "src": "SafetyLog", "tgt": "MonitorWindSpeed", "guard": "resetComplete == True" }
+]
+variables = ["windSpeed", "threshold", "rotor_cycle_counter", "MAX_ROTOR_CYCLES", "watchdog_triggered", "resetComplete"]
+initial_step = "MonitorWindSpeed"

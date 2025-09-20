@@ -1,0 +1,13 @@
+steps = [
+{"name": "Intake", "function": "OpenIntakeValve"},
+{"name": "Filter", "function": "StartFiltering"},
+{"name": "ChemicalAdd", "function": "InjectChemicals"},
+{"name": "Storage", "function": "SendToStorage"}
+]
+transitions = [
+{"src": "Intake", "tgt": "Filter", "guard": "intake_done"},
+{"src": "Filter", "tgt": "ChemicalAdd", "guard": "filter_complete"},
+{"src": "ChemicalAdd", "tgt": "Storage", "guard": "chemical_injected"}
+]
+variables = ["intake_done", "filter_complete", "chemical_injected"]
+initial_step = "Intake"

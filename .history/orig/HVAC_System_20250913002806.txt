@@ -1,0 +1,18 @@
+steps = [
+{"name": "SenseTemp", "function": "ReadTemperature"},
+{"name": "CheckTemp", "function": "EvaluateTemperature"},
+{"name": "Heat", "function": "TurnOnHeater"},
+{"name": "Cool", "function": "TurnOnCooler"},
+{"name": "Idle", "function": "MaintainState"}
+]
+transitions = [
+{"src": "SenseTemp", "tgt": "CheckTemp", "guard": "sensor_ok"},
+{"src": "CheckTemp", "tgt": "Heat", "guard": "temp_below_min"},
+{"src": "CheckTemp", "tgt": "Cool", "guard": "temp_above_max"},
+{"src": "CheckTemp", "tgt": "Idle", "guard": "temp_ok"},
+{"src": "Heat", "tgt": "SenseTemp", "guard": "heating_done"},
+{"src": "Cool", "tgt": "SenseTemp", "guard": "cooling_done"},
+{"src": "Idle", "tgt": "SenseTemp", "guard": "cycle_complete"}
+]
+variables = ["sensor_ok", "temp_below_min", "temp_above_max", "temp_ok", "heating_done", "cooling_done", "cycle_complete"]
+initial_step = "SenseTemp"

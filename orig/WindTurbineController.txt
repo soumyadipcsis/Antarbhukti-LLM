@@ -1,0 +1,12 @@
+steps = [
+{"name": "MonitorWindSpeed", "function": "ReadWindSensor()"},
+{"name": "AdjustBlades", "function": "SetBladeAngle()"},
+{"name": "GeneratePower", "function": "StartGenerator()"}
+]
+transitions = [
+{"src": "MonitorWindSpeed", "tgt": "AdjustBlades", "guard": "windSpeed > threshold"},
+{"src": "AdjustBlades", "tgt": "GeneratePower", "guard": "True"},
+{"src": "GeneratePower", "tgt": "MonitorWindSpeed", "guard": "True"}
+]
+variables = ["windSpeed", "threshold"]
+initial_step = "MonitorWindSpeed"

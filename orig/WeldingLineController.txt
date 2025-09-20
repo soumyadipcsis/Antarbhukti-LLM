@@ -1,0 +1,15 @@
+steps = [
+{"name": "LoadPart", "function": "PositionPart"},
+{"name": "Align", "function": "AlignForWelding"},
+{"name": "Weld", "function": "ActivateWelder"},
+{"name": "Cool", "function": "StartCooling"},
+{"name": "Unload", "function": "MovePartOut"}
+]
+transitions = [
+{"src": "LoadPart", "tgt": "Align", "guard": "part_loaded"},
+{"src": "Align", "tgt": "Weld", "guard": "alignment_ok"},
+{"src": "Weld", "tgt": "Cool", "guard": "welding_done"},
+{"src": "Cool", "tgt": "Unload", "guard": "cooling_done"}
+]
+variables = ["part_loaded", "alignment_ok", "welding_done", "cooling_done"]
+initial_step = "LoadPart"

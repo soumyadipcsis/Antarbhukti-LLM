@@ -1,0 +1,17 @@
+steps = [
+{ "name": "ScanBaggage", "function": "ReadBarcode" },
+{ "name": "RouteBaggage", "function": "ActivateSorter" },
+{ "name": "SafetyLog", "function": "RecordBaggageRouting" },
+{ "name": "LoadBaggage", "function": "MoveToConveyor" },
+{ "name": "SafetyError", "function": "HaltAndLogError" }
+]
+transitions = [
+{ "src": "ScanBaggage", "tgt": "RouteBaggage", "guard": "barcodeValid" },
+{ "src": "RouteBaggage", "tgt": "SafetyLog", "guard": "routeAssigned" },
+{ "src": "RouteBaggage", "tgt": "SafetyError", "guard": "routeAssigned == False" },
+{ "src": "SafetyLog", "tgt": "LoadBaggage", "guard": "True" },
+{ "src": "LoadBaggage", "tgt": "ScanBaggage", "guard": "True" },
+{ "src": "SafetyError", "tgt": "ScanBaggage", "guard": "errorCleared" }
+]
+variables = ["barcodeValid", "routeAssigned", "bag_id", "path_taken", "safety_interlock_status", "errorCleared"]
+initial_step = "ScanBaggage"

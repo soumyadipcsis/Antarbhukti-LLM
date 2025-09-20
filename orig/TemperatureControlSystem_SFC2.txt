@@ -1,0 +1,17 @@
+steps = [
+{ "name": "Monitor", "function": "ReadTemp" },
+{ "name": "Heat", "function": "TurnHeaterOn" },
+{ "name": "Cool", "function": "TurnCoolerOn" },
+{ "name": "SafetyLog", "function": "RecordTemperatureAction" }
+]
+transitions = [
+{ "src": "Monitor", "tgt": "Heat", "guard": "temp < MIN_TEMP" },
+{ "src": "Monitor", "tgt": "Cool", "guard": "temp > MAX_TEMP" },
+{ "src": "Heat", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "Cool", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyLog", "tgt": "Monitor", "guard": "true" },
+{ "src": "Heat", "tgt": "Monitor", "guard": "temp >= MIN_TEMP" },
+{ "src": "Cool", "tgt": "Monitor", "guard": "temp <= MAX_TEMP" }
+]
+variables = ["temp", "MIN_TEMP", "MAX_TEMP", "safety_log"]
+initial_step = "Monitor"

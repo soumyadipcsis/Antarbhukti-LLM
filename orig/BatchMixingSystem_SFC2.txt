@@ -1,0 +1,24 @@
+steps = [
+{ "name": "Idle", "function": "WaitForStart" },
+{ "name": "SafetyCheckInput", "function": "ValidateInputs" },
+{ "name": "SafetyError", "function": "HaltAndLog" },
+{ "name": "AddIngredient", "function": "OpenValve" },
+{ "name": "Mix", "function": "StartMixer" },
+{ "name": "SafetyLog", "function": "RecordBatchState" },
+{ "name": "TimeoutSafeStop", "function": "StopMixerPreserveState" },
+{ "name": "End", "function": "StopAll" }
+]
+transitions = [
+{ "src": "Idle", "tgt": "SafetyCheckInput", "guard": "startButton == true" },
+{ "src": "SafetyCheckInput", "tgt": "AddIngredient", "guard": "levelSensorOK == true AND valveSensorOK == true" },
+{ "src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "NOT (levelSensorOK == true AND valveSensorOK == true)" },
+{ "src": "AddIngredient", "tgt": "Mix", "guard": "ingredientAdded == true" },
+{ "src": "Mix", "tgt": "TimeoutSafeStop", "guard": "timeout_counter > 15 OR watchdog_triggered == true" },
+{ "src": "Mix", "tgt": "SafetyLog", "guard": "mixingTimeElapsed == true AND timeout_counter <= 15" },
+{ "src": "SafetyLog", "tgt": "End", "guard": "true" },
+{ "src": "TimeoutSafeStop", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyError", "tgt": "Idle", "guard": "errorCleared == true" },
+{ "src": "End", "tgt": "Idle", "guard": "true" }
+]
+variables = ['startButton', 'ingredientAdded', 'mixingTimeElapsed', 'timeout_counter', 'watchdog_triggered', 'levelSensorOK', 'valveSensorOK', 'errorCleared']
+initial_step = "Idle"

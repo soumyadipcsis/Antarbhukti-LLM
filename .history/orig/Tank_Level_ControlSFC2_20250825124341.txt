@@ -1,0 +1,16 @@
+steps = [
+    {"name": "ValidateInput", "function": "CheckLevelAndPressure"},
+    {"name": "Start", "function": "CheckLevel"},
+    {"name": "Fill", "function": "OpenInletValve"},
+    {"name": "Stop", "function": "CloseInletValve"},
+    {"name": "ValidationError", "function": "LogAndHalt"}
+]
+transitions = [
+    {"src": "ValidateInput", "tgt": "Start", "guard": "inputValid == true"},
+    {"src": "ValidateInput", "tgt": "ValidationError", "guard": "inputValid == false"},
+    {"src": "Start", "tgt": "Fill", "guard": "level < LOW"},
+    {"src": "Fill", "tgt": "Stop", "guard": "level >= HIGH"},
+    {"src": "Stop", "tgt": "Start", "guard": "level <= NORMAL"}
+]
+variables = [level, LOW, HIGH, NORMAL, pressure, inputValid]
+initial_step = ValidateInput

@@ -1,0 +1,22 @@
+steps = [
+{ "name": "Idle", "function": "WaitForObject" },
+{ "name": "Move", "function": "StartConveyor" },
+{ "name": "Stop", "function": "StopConveyor" },
+{ "name": "EmergencyStopCheck", "function": "MonitorJamAndCurrent" },
+{ "name": "EmergencyStop", "function": "HaltConveyorAndLog" },
+{ "name": "SafetyLog", "function": "RecordEvent" }
+]
+transitions = [
+{ "src": "Idle", "tgt": "Move", "guard": "objectDetected == true" },
+{ "src": "Move", "tgt": "EmergencyStop", "guard": "jamDetected == true OR motorCurrentHigh == true" },
+{ "src": "Move", "tgt": "Stop", "guard": "positionReached == true AND NOT (jamDetected == true OR motorCurrentHigh == true)" },
+{ "src": "Stop", "tgt": "EmergencyStop", "guard": "jamDetected == true OR motorCurrentHigh == true" },
+{ "src": "Stop", "tgt": "Idle", "guard": "objectCleared == true" },
+{ "src": "Move", "tgt": "EmergencyStopCheck", "guard": "true" },
+{ "src": "Stop", "tgt": "EmergencyStopCheck", "guard": "true" },
+{ "src": "EmergencyStopCheck", "tgt": "EmergencyStop", "guard": "jamDetected == true OR motorCurrentHigh == true" },
+{ "src": "EmergencyStop", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyLog", "tgt": "Idle", "guard": "emergencyCleared == true" }
+]
+variables = ['objectDetected', 'positionReached', 'objectCleared', 'jamDetected', 'motorCurrentHigh', 'emergencyCleared']
+initial_step = "Idle"

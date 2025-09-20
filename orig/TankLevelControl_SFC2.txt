@@ -1,0 +1,19 @@
+steps = [
+{ "name": "Start", "function": "CheckLevel" },
+{ "name": "SafetyCheckInput", "function": "ValidateLevelAndPressure" },
+{ "name": "SafetyError", "function": "CloseValvesAndLog" },
+{ "name": "Fill", "function": "OpenInletValve" },
+{ "name": "Stop", "function": "CloseInletValve" },
+{ "name": "SafetyLog", "function": "RecordTankState" }
+]
+transitions = [
+{ "src": "Start", "tgt": "SafetyCheckInput", "guard": "true" },
+{ "src": "SafetyCheckInput", "tgt": "Fill", "guard": "levelSensorOK == true AND pressureSensorOK == true AND level < LOW" },
+{ "src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "NOT (levelSensorOK == true AND pressureSensorOK == true)" },
+{ "src": "Fill", "tgt": "Stop", "guard": "level >= HIGH" },
+{ "src": "Stop", "tgt": "Start", "guard": "level <= NORMAL" },
+{ "src": "SafetyError", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyLog", "tgt": "Start", "guard": "errorCleared == true" }
+]
+variables = ["level", "LOW", "HIGH", "NORMAL", "levelSensorOK", "pressureSensorOK", "errorCleared"]
+initial_step = "Start"

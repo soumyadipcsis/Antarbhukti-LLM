@@ -1,0 +1,23 @@
+steps = [
+{ "name": "Intake", "function": "OpenIntakeValve" },
+{ "name": "SafetyCheckInput", "function": "ValidateConcentrationPHAndLevel" },
+{ "name": "SafetyError", "function": "LogAndHaltOperations" },
+{ "name": "Filter", "function": "StartFiltering" },
+{ "name": "ChemicalAdd", "function": "InjectChemicals" },
+{ "name": "Storage", "function": "SendToStorage" },
+{ "name": "SafetyLog", "function": "RecordPlantState" }
+]
+transitions = [
+{ "src": "Intake", "tgt": "SafetyCheckInput", "guard": "true" },
+{ "src": "SafetyCheckInput", "tgt": "Filter", "guard": "sensorsOK == true AND intake_done == true" },
+{ "src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "NOT (sensorsOK == true)" },
+{ "src": "Filter", "tgt": "SafetyCheckInput", "guard": "filter_complete == true" },
+{ "src": "Filter", "tgt": "SafetyError", "guard": "NOT (sensorsOK == true)" },
+{ "src": "SafetyCheckInput", "tgt": "ChemicalAdd", "guard": "sensorsOK == true AND filter_complete == true" },
+{ "src": "ChemicalAdd", "tgt": "SafetyLog", "guard": "chemical_injected == true" },
+{ "src": "SafetyLog", "tgt": "Storage", "guard": "true" },
+{ "src": "Storage", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyError", "tgt": "SafetyLog", "guard": "true" }
+]
+variables = ["intake_done", "filter_complete", "chemical_injected", "concentration", "pH", "level", "sensorsOK", "errorCleared"]
+initial_step = "Intake"

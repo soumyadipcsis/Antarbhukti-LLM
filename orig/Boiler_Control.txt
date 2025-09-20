@@ -1,0 +1,16 @@
+steps = [
+{"name": "Init", "function": "InitializeBoiler"},
+{"name": "HeatWater", "function": "StartHeater"},
+{"name": "CheckPressure", "function": "ReadPressureSensor"},
+{"name": "Regulate", "function": "AdjustValve"},
+{"name": "Shutdown", "function": "TurnOffBoiler"}
+]
+transitions = [
+{"src": "Init", "tgt": "HeatWater", "guard": "init_done"},
+{"src": "HeatWater", "tgt": "CheckPressure", "guard": "temp_threshold_reached"},
+{"src": "CheckPressure", "tgt": "Regulate", "guard": "pressure_not_ok"},
+{"src": "Regulate", "tgt": "CheckPressure", "guard": "adjustment_done"},
+{"src": "CheckPressure", "tgt": "Shutdown", "guard": "pressure_ok"}
+]
+variables = ["init_done", "temp_threshold_reached", "pressure_not_ok", "adjustment_done", "pressure_ok"]
+initial_step = "Init"

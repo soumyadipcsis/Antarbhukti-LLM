@@ -1,0 +1,47 @@
+steps = [
+{ "name": "SenseTemp", "function": "ReadTemperature" },
+{ "name": "SafetyCheckInput", "function": "ValidateSensorInput" },
+{ "name": "CheckTemp", "function": "EvaluateTemperature" },
+{ "name": "Heat", "function": "TurnOnHeater" },
+{ "name": "Cool", "function": "TurnOnCooler" },
+{ "name": "Idle", "function": "MaintainState" },
+{ "name": "EmergencyStopCheck", "function": "AssessEmergencyConditions" },
+{ "name": "EmergencyStop", "function": "EnterEmergencyStop" },
+{ "name": "SafetyLog", "function": "LogSafetyEvent" },
+{ "name": "SafeShutdown", "function": "ShutdownHVAC" }
+]
+
+transitions = [
+{ "src": "SenseTemp", "tgt": "SafetyCheckInput", "guard": "true" },
+
+{ "src": "SafetyCheckInput", "tgt": "CheckTemp", "guard": "input_valid and sensor_ok" },
+{ "src": "SafetyCheckInput", "tgt": "SafetyLog", "guard": "input_invalid and not unsafe_sensor_detected" },
+{ "src": "SafetyCheckInput", "tgt": "EmergencyStopCheck", "guard": "unsafe_sensor_detected" },
+
+{ "src": "CheckTemp", "tgt": "Heat", "guard": "temp_below_min and input_valid" },
+{ "src": "CheckTemp", "tgt": "Cool", "guard": "temp_above_max and input_valid" },
+{ "src": "CheckTemp", "tgt": "Idle", "guard": "temp_ok and input_valid" },
+
+{ "src": "Heat", "tgt": "SenseTemp", "guard": "heating_done and input_valid" },
+{ "src": "Cool", "tgt": "SenseTemp", "guard": "cooling_done and input_valid" },
+{ "src": "Idle", "tgt": "SenseTemp", "guard": "cycle_complete and input_valid" },
+
+{ "src": "CheckTemp", "tgt": "EmergencyStopCheck", "guard": "emergency_triggered" },
+{ "src": "Heat", "tgt": "EmergencyStopCheck", "guard": "emergency_triggered" },
+{ "src": "Cool", "tgt": "EmergencyStopCheck", "guard": "emergency_triggered" },
+{ "src": "Idle", "tgt": "EmergencyStopCheck", "guard": "emergency_triggered" },
+
+{ "src": "EmergencyStopCheck", "tgt": "EmergencyStop", "guard": "emergency_confirmed" },
+{ "src": "EmergencyStopCheck", "tgt": "SenseTemp", "guard": "not emergency_confirmed and input_valid" },
+
+{ "src": "EmergencyStop", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyLog", "tgt": "SafeShutdown", "guard": "log_complete" },
+
+{ "src": "SafeShutdown", "tgt": "Idle", "guard": "manual_reset" },
+
+{ "src": "SafetyLog", "tgt": "Idle", "guard": "log_complete and not unsafe_sensor_detected and not emergency_confirmed" }
+]
+
+variables = ['sensor_ok', 'temp_below_min', 'temp_above_max', 'temp_ok', 'heating_done', 'cooling_done', 'cycle_complete', 'input_valid', 'input_invalid','unsafe_sensor_detected', 'emergency_triggered', 'emergency_confirmed', 'log_complete', 'safe_shutdown_done', 'manual_reset']
+
+initial_step = "SenseTemp"

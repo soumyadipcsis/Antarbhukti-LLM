@@ -1,0 +1,12 @@
+steps = [
+{"name": "Idle", "function": "WaitForCard()"},
+{"name": "Authorize", "function": "CheckCard()"},
+{"name": "Dispense", "function": "StartPump()"}
+]
+transitions = [
+{"src": "Idle", "tgt": "Authorize", "guard": "cardInserted == True"},
+{"src": "Authorize", "tgt": "Dispense", "guard": "authSuccess == True"},
+{"src": "Dispense", "tgt": "Idle", "guard": "dispenseDone == True"}
+]
+variables = ["cardInserted", "authSuccess", "dispenseDone"]
+initial_step = "Idle"

@@ -78,10 +78,8 @@ class LLM_Mgr(ABC):
 
     def improve_code(self, prompt, modified, sfc2_path):
         # Send the prompt to the LLM and get the response
-        llm_response, token_usage = self._do_improve(prompt)
-        # print("=== LLM OUTPUT ===")  
-        # print(llm_response)          # Print the model's response
-        # print("==================")  
+        # Send the prompt to the LLM and get the response and token count
+        llm_response, total_tokens = self._do_improve(prompt) # Expects a tuple now
 
         # Save the model's response to a file for checking and debugging
         with open("llm_response.txt", "w") as f:
@@ -91,13 +89,13 @@ class LLM_Mgr(ABC):
         code_block = self.extract_code_block(llm_response)
         if not code_block:  
             print("No valid code block found in LLM output.")
-            return None
+            return None, total_tokens # Return token count even on failure
         try:
             # Execute the extracted code to get updated steps2 and transitions2
             steps2, transitions2 = self.sfc2_code_to_python(code_block)
         except Exception as e:  # Handle code parsing errors
             print(f"Error parsing LLM output: {e}")
-            return False
+            return False, total_tokens # Return token count even on failure
 
         # Helper function to format a list of dicts as Python code
         def format_list_of_dicts(name, lst):
@@ -132,7 +130,7 @@ class LLM_Mgr(ABC):
             f.write(format_string("initial_step", modified.initial_step))  
 #        print(f"Updated SFC2 saved to {sfc2_path}")
 
-        return True  # Indicate that improvement was successfully applied
+        return True, total_tokens # Indicate that improvement was successfully applied
 
     # def improve_sfc(self, prompt):
     #     response = self.llm.invoke([HumanMessage(content=prompt)])  # Send the prompt to the LLM and get response

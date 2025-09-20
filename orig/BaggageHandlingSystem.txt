@@ -1,0 +1,12 @@
+steps = [
+{"name": "ScanBaggage", "function": "ReadBarcode()"},
+{"name": "RouteBaggage", "function": "ActivateSorter()"},
+{"name": "LoadBaggage", "function": "MoveToConveyor()"}
+]
+transitions = [
+{"src": "ScanBaggage", "tgt": "RouteBaggage", "guard": "barcodeValid == True"}, 
+{"src": "RouteBaggage", "tgt": "LoadBaggage", "guard": "routeAssigned == True"},
+{"src": "LoadBaggage", "tgt": "ScanBaggage", "guard": "True"}
+]
+variables = ["barcodeValid", "routeAssigned"]
+initial_step = "ScanBaggage"

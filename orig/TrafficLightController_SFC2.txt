@@ -1,0 +1,18 @@
+steps = [
+{ "name": "Green", "function": "SetGreen" },
+{ "name": "Yellow", "function": "SetYellow" },
+{ "name": "Red", "function": "SetRed" },
+{ "name": "TimeoutSafeStop", "function": "ResetController" },
+{ "name": "SafetyLog", "function": "RecordTimeoutEvent" }
+]
+transitions = [
+{ "src": "Green", "tgt": "TimeoutSafeStop", "guard": "greenTimeout_counter > MAX_GREEN_DURATION" },
+{ "src": "Red", "tgt": "TimeoutSafeStop", "guard": "redTimeout_counter > MAX_RED_DURATION" },
+{ "src": "Green", "tgt": "Yellow", "guard": "greenTimeElapsed == true AND greenTimeout_counter <= MAX_GREEN_DURATION" },
+{ "src": "Yellow", "tgt": "Red", "guard": "yellowTimeElapsed == true" },
+{ "src": "Red", "tgt": "Green", "guard": "redTimeElapsed == true AND redTimeout_counter <= MAX_RED_DURATION" },
+{ "src": "TimeoutSafeStop", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyLog", "tgt": "Red", "guard": "resetComplete == true" }
+]
+variables = ["greenTimeElapsed", "yellowTimeElapsed", "redTimeElapsed", "greenTimeout_counter", "redTimeout_counter", "MAX_GREEN_DURATION", "MAX_RED_DURATION", "resetComplete"]
+initial_step = "Green"

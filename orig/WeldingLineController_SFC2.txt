@@ -1,0 +1,23 @@
+steps = [
+{ "name": "LoadPart", "function": "PositionPart" },
+{ "name": "Align", "function": "AlignForWelding" },
+{ "name": "SafetyCheckInput", "function": "ValidateAlignmentAndReadiness" },
+{ "name": "SafetyError", "function": "LogAndStopWelding" },
+{ "name": "Weld", "function": "ActivateWelder" },
+{ "name": "Cool", "function": "StartCooling" },
+{ "name": "Unload", "function": "MovePartOut" },
+{ "name": "SafetyLog", "function": "RecordWeldEvent" }
+]
+transitions = [
+{ "src": "LoadPart", "tgt": "Align", "guard": "part_loaded == true" },
+{ "src": "Align", "tgt": "SafetyCheckInput", "guard": "alignment_ok_detected == true" },
+{ "src": "SafetyCheckInput", "tgt": "Weld", "guard": "alignment_ok == true AND welding_ready == true" },
+{ "src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "NOT (alignment_ok == true AND welding_ready == true)" },
+{ "src": "Weld", "tgt": "Cool", "guard": "welding_done == true" },
+{ "src": "Cool", "tgt": "Unload", "guard": "cooling_done == true" },
+{ "src": "Unload", "tgt": "SafetyLog", "guard": "true" },
+{ "src": "SafetyLog", "tgt": "LoadPart", "guard": "true" },
+{ "src": "SafetyError", "tgt": "SafetyLog", "guard": "true" }
+]
+variables = ["part_loaded", "alignment_ok_detected", "alignment_ok", "welding_ready", "welding_done", "cooling_done", "errorCleared" ]
+initial_step = "LoadPart"

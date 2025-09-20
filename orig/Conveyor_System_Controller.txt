@@ -1,0 +1,12 @@
+steps = [
+{"name": "Idle", "function": "WaitForObject"},
+{"name": "Move", "function": "StartConveyor"},
+{"name": "Stop", "function": "StopConveyor"}
+]
+transitions = [
+{"src": "Idle", "tgt": "Move", "guard": "objectDetected == true"},
+{"src": "Move", "tgt": "Stop", "guard": "positionReached == true"},
+{"src": "Stop", "tgt": "Idle", "guard": "objectCleared == true"}
+]
+variables = ["objectDetected", "positionReached", "objectCleared"]
+initial_step = "Idle"

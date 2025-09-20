@@ -1,0 +1,13 @@
+Tank_Level_Control:
+steps:
+{"name": "Start", "function": "CheckLevel"}
+{"name": "Fill", "function": "OpenInletValve"}
+{"name": "Stop", "function": "CloseInletValve"}
+transitions:
+{"src": "Start", "tgt": "Fill", "guard": "level < LOW"}
+{"src": "Fill", "tgt": "Stop", "guard": "level >= HIGH"}
+{"src": "Stop", "tgt": "Start", "guard": "level <= NORMAL"}
+variables:
+level, LOW, HIGH, NORMAL
+initial_step:
+Start

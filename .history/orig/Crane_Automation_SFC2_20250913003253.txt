@@ -1,0 +1,29 @@
+steps = [
+{ "name": "Ready", "function": "SystemCheck" },
+{ "name": "Lift", "function": "LiftLoad" },
+{ "name": "Move", "function": "MoveToPosition" },
+{ "name": "Lower", "function": "LowerLoad" },
+{ "name": "Return", "function": "ReturnToBase" },
+{ "name": "WatchdogCheck", "function": "MonitorLoadAndPosition" },
+{ "name": "WatchdogError", "function": "HaltAndLogFault" },
+{ "name": "WatchdogLog", "function": "RecordWatchdogEvent" },
+{ "name": "ErrorHandler", "function": "SafeAbortProcedure" }
+]
+transitions = [
+{ "src": "Ready", "tgt": "Lift", "guard": "load_detected" },
+{ "src": "Lift", "tgt": "WatchdogCheck", "guard": "load_lifted" },
+{ "src": "WatchdogCheck", "tgt": "Move", "guard": "watchdog_ok" },
+{ "src": "WatchdogCheck", "tgt": "WatchdogError", "guard": "watchdog_abnormal" },
+{ "src": "Move", "tgt": "WatchdogCheck", "guard": "position_reached" },
+{ "src": "WatchdogCheck", "tgt": "Lower", "guard": "watchdog_ok" },
+{ "src": "WatchdogCheck", "tgt": "WatchdogError", "guard": "watchdog_abnormal" },
+{ "src": "Lower", "tgt": "WatchdogCheck", "guard": "load_lowered" },
+{ "src": "WatchdogCheck", "tgt": "Return", "guard": "watchdog_ok" },
+{ "src": "WatchdogCheck", "tgt": "WatchdogError", "guard": "watchdog_abnormal" },
+{ "src": "Return", "tgt": "Ready", "guard": "at_base" },
+{ "src": "WatchdogError", "tgt": "WatchdogLog", "guard": "log_started" },
+{ "src": "WatchdogLog", "tgt": "ErrorHandler", "guard": "log_completed" },
+{ "src": "ErrorHandler", "tgt": "Ready", "guard": "safe_reset_performed" }
+]
+variables = ['load_detected', 'load_lifted', 'position_reached', 'load_lowered', 'at_base', 'watchdog_ok', 'watchdog_abnormal', 'log_started', 'log_completed', 'safe_reset_performed', 'load_weight', 'position_value', 'overload_threshold']
+initial_step = "Ready"

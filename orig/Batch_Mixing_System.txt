@@ -1,0 +1,13 @@
+steps = [
+{"name": "Idle", "function": "WaitForStart"},
+{"name": "AddIngredient", "function": "OpenValve"},
+{"name": "Mix", "function": "StartMixer"},
+{"name": "End", "function": "StopAll"}
+]
+transitions = [
+{"src": "Idle", "tgt": "AddIngredient", "guard": "startButton == true"},
+{"src": "AddIngredient", "tgt": "Mix", "guard": "ingredientAdded == true"},
+{"src": "Mix", "tgt": "End", "guard": "mixingTimeElapsed == true"}
+]
+variables = ["startButton", "ingredientAdded", "mixingTimeElapsed"]
+initial_step = "Idle"   

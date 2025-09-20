@@ -78,7 +78,7 @@ class LLM_Mgr(ABC):
 
     def improve_code(self, prompt, modified, sfc2_path):
         # Send the prompt to the LLM and get the response
-        llm_response, token_usage = self._do_improve(prompt)
+        llm_response = self._do_improve(prompt)
         # print("=== LLM OUTPUT ===")  
         # print(llm_response)          # Print the model's response
         # print("==================")  

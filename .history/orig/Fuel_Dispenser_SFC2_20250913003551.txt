@@ -1,0 +1,21 @@
+steps = [
+{ "name": "Idle", "function": "WaitForCard" },
+{ "name": "ValidateInput", "function": "CheckFuelAmountAndNozzle" },
+{ "name": "Authorize", "function": "CheckCard" },
+{ "name": "Dispense", "function": "StartPump" },
+{ "name": "ValidationError", "function": "BlockAndLogValidationFault" },
+{ "name": "ErrorHandler", "function": "SafeAbort" }
+]
+transitions = [
+{ "src": "Idle", "tgt": "ValidateInput", "guard": "cardInserted == True" },
+{ "src": "ValidateInput", "tgt": "Authorize", "guard": "input_valid == True" },
+{ "src": "ValidateInput", "tgt": "ValidationError", "guard": "input_valid == False" },
+{ "src": "Authorize", "tgt": "Dispense", "guard": "authSuccess == True and nozzle_ok == True" },
+{ "src": "Authorize", "tgt": "ValidationError", "guard": "authSuccess == True and nozzle_ok == False" },
+{ "src": "Dispense", "tgt": "Idle", "guard": "dispenseDone == True" },
+{ "src": "ValidationError", "tgt": "ErrorHandler", "guard": "error_logged" },
+{ "src": "ErrorHandler", "tgt": "Idle", "guard": "manual_reset_done" }
+]
+variables = [ cardInserted, authSuccess, dispenseDone, input_valid, nozzle_ok, error_logged, manual_reset_done, requested_amount,
+nozzle_sensor_value, min_amount, max_amount ]
+initial_step = Idle
