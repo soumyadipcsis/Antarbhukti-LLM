@@ -6,15 +6,15 @@ Paths in Model 1 with NO equivalent path in Model 2
 From	      To	        Transitions	    Z3 Condition	   Z3 Data Transformation
 
 From	To	Transitions	Condition	Data Transformation
-MonitorTemperature	AdjustVentilation	['t_0']	(> temp threshold)	true
+MonitorTemp	StopReaction	['t_1']	(> temp safeLimit)	true
 
 Here is the current SFC2 Python code:
-steps2 = [{'name': 'MonitorTemperature', 'function': 'ReadSensor(temp)'}, {'name': 'CheckSensorHealth', 'function': 'VerifySensorFreshness()'}, {'name': 'AdjustVentilation', 'function': 'ControlFan(temp)'}, {'name': 'LogData', 'function': 'Log(temp, humidity)'}, {'name': 'TimeoutSafeStop', 'function': 'HaltActuatorsSafely()'}]
-transitions2 = [{'src': 'MonitorTemperature', 'tgt': 'CheckSensorHealth', 'guard': 'True'}, {'src': 'CheckSensorHealth', 'tgt': 'AdjustVentilation', 'guard': 'sensorFresh == True'}, {'src': 'AdjustVentilation', 'tgt': 'LogData', 'guard': 'True'}, {'src': 'LogData', 'tgt': 'MonitorTemperature', 'guard': 'True'}, {'src': 'CheckSensorHealth', 'tgt': 'TimeoutSafeStop', 'guard': 'timeout_counter > timeout_limit'}, {'src': 'AdjustVentilation', 'tgt': 'TimeoutSafeStop', 'guard': 'fanOnTime > maxFanOnTime'}]
+steps2 = [{'name': 'StartReaction', 'function': 'InitChemicals()'}, {'name': 'MonitorTemp', 'function': 'CheckTemperature()'}, {'name': 'EmergencyStopCheck', 'function': 'CheckEmergencyConditions()'}, {'name': 'EmergencyStop', 'function': 'ShutdownReactorSafely()'}, {'name': 'StopReaction', 'function': 'EndProcess()'}]
+transitions2 = [{'src': 'StartReaction', 'tgt': 'MonitorTemp', 'guard': 'reactionStarted == True'}, {'src': 'MonitorTemp', 'tgt': 'EmergencyStopCheck', 'guard': 'True'}, {'src': 'EmergencyStopCheck', 'tgt': 'EmergencyStop', 'guard': 'unsafeCondition == True'}, {'src': 'EmergencyStopCheck', 'tgt': 'StopReaction', 'guard': 'temp > safeLimit and unsafeCondition == False'}, {'src': 'StopReaction', 'tgt': 'StartReaction', 'guard': 'True'}]
 
 Here is the SFC1 Python code for reference:
-steps1 = [{'name': 'MonitorTemperature', 'function': 'ReadSensor(temp)'}, {'name': 'AdjustVentilation', 'function': 'ControlFan(temp)'}, {'name': 'LogData', 'function': 'Log(temp, humidity)'}]
-transitions1 = [{'src': 'MonitorTemperature', 'tgt': 'AdjustVentilation', 'guard': 'temp > threshold'}, {'src': 'AdjustVentilation', 'tgt': 'LogData', 'guard': 'True'}, {'src': 'LogData', 'tgt': 'MonitorTemperature', 'guard': 'True'}]
+steps1 = [{'name': 'StartReaction', 'function': 'InitChemicals()'}, {'name': 'MonitorTemp', 'function': 'CheckTemperature()'}, {'name': 'StopReaction', 'function': 'EndProcess()'}]
+transitions1 = [{'src': 'StartReaction', 'tgt': 'MonitorTemp', 'guard': 'reactionStarted == True'}, {'src': 'MonitorTemp', 'tgt': 'StopReaction', 'guard': 'temp > safeLimit'}, {'src': 'StopReaction', 'tgt': 'StartReaction', 'guard': 'True'}]
 
 Please modify steps2 and transitions2 so that all above paths are covered and equivalence will hold. 
 Only output valid Python code for steps2 and transitions2, nothing else.

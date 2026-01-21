@@ -3,6 +3,11 @@ streamlit
 pandas
 altair
 openai
+google-generativeai
+anthropic
+groq
+perplexityai
+
 
 # Core dependencies
 z3-solver>=4.12.0
