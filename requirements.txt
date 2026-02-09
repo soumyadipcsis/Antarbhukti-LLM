@@ -1,34 +1,57 @@
-# Web App
+# ==========================================================
+# FORCE CLEAN ENVIRONMENT & PACKAGING INVARIANTS
+# ==========================================================
+# Streamlit Cloud sometimes omits these unless explicitly pinned
+pip>=23.2
+setuptools==68.2.2
+wheel>=0.41.0
+
+# ==========================================================
+# WEB APP
+# ==========================================================
 streamlit
 pandas
 altair
 openpyxl
 
+# ==========================================================
 # LLM SDKs
+# ==========================================================
 openai>=1.0.0
 anthropic
 groq
-# CRITICAL: Use the legacy library pinned to a stable version to match your code
+
+# CRITICAL: Legacy Gemini SDK pinned to known-good version
 google-generativeai==0.8.3
 
-# Core Logic
+# ==========================================================
+# CORE LOGIC / SOLVER
+# ==========================================================
+# z3 requires pkg_resources from setuptools (NOT declared upstream)
 z3-solver==4.12.2.0
-setuptools>=65.0
+
 python-dotenv
 graphviz>=0.20.0
 
-# LangChain (Minimized - REMOVED langchain-community)
-langchain-openai>=0.1.0
+# ==========================================================
+# LANGCHAIN (MINIMAL, UI-SAFE)
+# ==========================================================
 langchain-core>=0.1.0
+langchain-openai>=0.1.0
 
-# Tools (Removed heavy dev tools like pytest/flake8 to save memory)
+# ==========================================================
+# DEV / ANALYSIS TOOLS
+# ==========================================================
+# NOTE: These are heavy but safe. Remove later only for cold-start speed.
 pytest>=7.0.0
 pytest-cov>=4.0.0
 pytest-mock>=3.10.0
+
 flake8>=6.0.0
 flake8-docstrings>=1.7.0
 black>=23.0.0
-bandit>=1.7.0
-safety>=2.3.0
 isort>=5.12.0
 mypy>=1.0.0
+
+bandit>=1.7.0
+safety>=2.3.0

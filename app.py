@@ -24,15 +24,7 @@ import json
 import pandas as pd
 import altair as alt
 import streamlit.components.v1 as components
-#import pkg_resources
-import setuptools
-import z3
 
-st.write("Python executable:", sys.executable)
-st.write("Python version:", sys.version)
-st.write("setuptools version:", setuptools.__version__)
-st.write("pkg_resources OK")
-st.write("z3 version:", z3.get_version_string())
 # --- PATH SETUP: Ensure we can find src ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.join(current_dir, "src")
