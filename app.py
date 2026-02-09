@@ -542,9 +542,9 @@ with st.sidebar:
         help="Select one or multiple models. They will run sequentially for each file."
     )
 
-def add_log_text(logs, msg, panel):
+def add_log_text(logs, msg, panel,key_prefix):
     logs += f"[{datetime.datetime.now().strftime('%H:%M:%S')}] {msg}\n"
-    panel.text_area("Console Stream", logs, height=400, label_visibility="collapsed")
+    panel.text_area("Console Stream", logs, height=400, label_visibility="collapsed", key=f"{key_prefix}_log")
     return logs
 
 # ---------------------------
@@ -758,7 +758,7 @@ with tab_run:
                         env_vars["BENCHMARK_CSV_PATH"] = session_csv_path
                         try:
                             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, env=env_vars)
-                            for line in process.stdout: logs = add_log_text(logs, line.rstrip(), log_panel)
+                            for line in process.stdout: logs = add_log_text(logs, line.rstrip(), log_panel,key_prefix=f"job_{i}")
                             retcode = process.wait()
                             if retcode == 0: status.update(label=f"✅ Verified: {pair['name']}", state="complete", expanded=False)
                             else: status.update(label=f"❌ Failed: {pair['name']}", state="error", expanded=False)
