@@ -24,7 +24,7 @@ import json
 import pandas as pd
 import altair as alt
 import streamlit.components.v1 as components
-import pkg_resources
+#import pkg_resources
 import setuptools
 import z3
 
