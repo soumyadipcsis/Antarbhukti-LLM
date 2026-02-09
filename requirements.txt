@@ -13,7 +13,7 @@ google-generativeai==0.8.3
 
 # Core Logic
 z3-solver==4.12.2.0
-setuptools
+setuptools>=65.0
 python-dotenv
 graphviz>=0.20.0
 
@@ -22,13 +22,13 @@ langchain-openai>=0.1.0
 langchain-core>=0.1.0
 
 # Tools (Removed heavy dev tools like pytest/flake8 to save memory)
-# pytest>=7.0.0
-# pytest-cov>=4.0.0
-# pytest-mock>=3.10.0
-# flake8>=6.0.0
-# flake8-docstrings>=1.7.0
-# black>=23.0.0
-# bandit>=1.7.0
-# safety>=2.3.0
-# isort>=5.12.0
-# mypy>=1.0.0
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+flake8>=6.0.0
+flake8-docstrings>=1.7.0
+black>=23.0.0
+bandit>=1.7.0
+safety>=2.3.0
+isort>=5.12.0
+mypy>=1.0.0
