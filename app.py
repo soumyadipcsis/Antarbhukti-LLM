@@ -25,6 +25,9 @@ import pandas as pd
 import altair as alt
 import streamlit.components.v1 as components
 
+st.write("Python executable:", sys.executable)
+st.write("Python version:", sys.version)
+
 # --- PATH SETUP: Ensure we can find src ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.join(current_dir, "src")
