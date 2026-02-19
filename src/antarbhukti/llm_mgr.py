@@ -85,19 +85,26 @@ class LLM_Mgr(ABC):
             with open("claude_raw_output.txt", "w", encoding="utf-8") as f:
                 f.write(llm_response)
 
+        if self.name.lower() == "gemini":
+            with open("gemini_raw_output.txt", "w", encoding="utf-8") as f:
+                f.write(llm_response)
+        
         # Check for API error in the response
-        if "Error code:" in llm_response or "not_found_error" in llm_response:
+        lower = llm_response.lower()
+        if (
+            "error" in lower
+            and ("403" in lower or "api key" in lower or "not found" in lower)
+        ):
             error_msg = llm_response.strip()
-            print("\n[Claude API Error]")
-            print("Model Not Found or Invalid API Key.")
-            print("Raw error message from Claude API:")
-            #print(error_msg)
+            print(f"\n[{self.name} API Error]")
+            print(error_msg)
             return {
                 "improved": False,
                 "error": error_msg,
                 "token_usage": token_usage,
                 "llm_time": 0
             }
+
 
         # Extract the code block (steps2, transitions2) from the LLM response
         code_block = self.extract_code_block(llm_response)
