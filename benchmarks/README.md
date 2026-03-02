@@ -16,7 +16,7 @@ patterns.
 
 ## Usage
 
-python ST2SFC.py \<file.st\>
+python3 OSCAT_ST_2_SFC_4_Antarbhukti.py \<file.st\>
 
 ## Purpose
 
