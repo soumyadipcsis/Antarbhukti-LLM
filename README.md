@@ -1,4 +1,4 @@
-# AntarBhukti-LLM
+# AntarBhukti-LLM (LLMA)
 
 AntarBhukti is a verification tool for evolving software, designed to verify changes between two versions of SFCs (Sequential Function Charts). It includes enhanced LLM prompts for superior SFC generation quality.
 
