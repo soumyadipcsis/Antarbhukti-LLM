@@ -1,4 +1,4 @@
-# AntarBhukti-LLM
+# AntarBhukti-LLM (LLMA)
 
 AntarBhukti is a verification tool for evolving software, designed to verify changes between two versions of SFCs (Sequential Function Charts). It includes enhanced LLM prompts for superior SFC generation quality.
 
@@ -283,6 +283,8 @@ Antarbhukti-LLM/
 - **Coverage:** All 80 OSCAT automation benchmarks
 - **Comparison:** `benchmarks/Benchmark-Source-OSCAT.py` vs `benchmarks/Benchmarks-Upgrade-OSCAT.py`
 - **Reference:** ST code available in [SamaTulyata4PLC](https://github.com/soumyadipcsis/SamaTulyata4PLC)
+## Tool Demo Video
+[![Watch the demo](https://img.youtube.com/vi/3H4f9JzFQ-8/0.jpg)](https://www.youtube.com/watch?v=3H4f9JzFQ-8)
 
 ## License
 

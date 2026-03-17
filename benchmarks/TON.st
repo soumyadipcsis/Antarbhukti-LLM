@@ -1,0 +1,18 @@
+FUNCTION_BLOCK TON
+VAR_INPUT
+    IN : BOOL;
+    PT : TIME;
+END_VAR
+VAR_OUTPUT
+    Q : BOOL;
+END_VAR
+VAR
+    state : INT := 0;
+END_VAR
+
+CASE state OF
+0: IF IN THEN state := 1; END_IF;
+1: state := 2;
+2: Q := TRUE;
+END_CASE;
+END_FUNCTION_BLOCK
