@@ -1,0 +1,43 @@
+steps = [
+{"name": "Init","function": "output := 0"},
+{"name": "Check","function": ""},
+{"name": "On","function": "output := 1"
+},
+    {
+        "name": "Off",
+        "function": "output := 0"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "On",
+        "guard": "input > threshold"
+    },
+    {
+        "src": "Check",
+        "tgt": "Off",
+        "guard": "input <= threshold"
+    },
+    {
+        "src": "On",
+        "tgt": "End",
+        "guard": "True"
+    },
+    {
+        "src": "Off",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["input", "threshold", "output", "init"]
+initial_step = "Init"

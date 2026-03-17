@@ -1,0 +1,51 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "sum := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Add",
+        "function": "sum := sum + input"
+    },
+    {
+        "name": "Reset",
+        "function": "sum := 0"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Add",
+        "guard": "enable == 1"
+    },
+    {
+        "src": "Add",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "Reset",
+        "guard": "reset == 1"
+    },
+    {
+        "src": "Reset",
+        "tgt": "Check",
+        "guard": "True"
+    }
+]
+variables = ["input", "enable", "reset", "sum", "init"]
+initial_step = "Init"

@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "absn := n if n >= 0 else -n"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["absn", "n", "init"]
+initial_step = "Init"

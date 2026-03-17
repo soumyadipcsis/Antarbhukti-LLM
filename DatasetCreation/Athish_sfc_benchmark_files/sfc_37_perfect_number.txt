@@ -1,0 +1,56 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "sum := 0; i := 1"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "DivAdd",
+        "function": "sum := sum + i"
+    },
+    {
+        "name": "Inc",
+        "function": "i := i+1"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "DivAdd",
+        "guard": "i < n and n % i == 0"
+    },
+    {
+        "src": "Check",
+        "tgt": "Inc",
+        "guard": "i < n and n % i != 0"
+    },
+    {
+        "src": "DivAdd",
+        "tgt": "Inc",
+        "guard": "True"
+    },
+    {
+        "src": "Inc",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "i >= n"
+    }
+]
+variables = ["sum", "i", "n", "init"]
+initial_step = "Init"

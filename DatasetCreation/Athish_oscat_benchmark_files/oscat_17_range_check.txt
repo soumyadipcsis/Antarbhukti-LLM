@@ -1,0 +1,51 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "in_range := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Set",
+        "function": "in_range := 1"
+    },
+    {
+        "name": "Reset",
+        "function": "in_range := 0"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Set",
+        "guard": "input >= low and input <= high"
+    },
+    {
+        "src": "Check",
+        "tgt": "Reset",
+        "guard": "input < low or input > high"
+    },
+    {
+        "src": "Set",
+        "tgt": "End",
+        "guard": "True"
+    },
+    {
+        "src": "Reset",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["input", "low", "high", "in_range", "init"]
+initial_step = "Init"

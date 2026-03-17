@@ -1,0 +1,51 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "i := 2; is_prime := True"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Step",
+        "function": "is_prime := is_prime and (n % i != 0)"
+    },
+    {
+        "name": "Inc",
+        "function": "i := i + 1"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Step",
+        "guard": "i*i <= n and is_prime"
+    },
+    {
+        "src": "Step",
+        "tgt": "Inc",
+        "guard": "True"
+    },
+    {
+        "src": "Inc",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "not is_prime or i*i > n"
+    }
+]
+variables = ["i", "is_prime", "n", "init"]
+initial_step = "Init"

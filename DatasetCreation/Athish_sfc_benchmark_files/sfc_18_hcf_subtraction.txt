@@ -1,0 +1,56 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "x := a; y := b"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "StepX",
+        "function": "x := x - y"
+    },
+    {
+        "name": "StepY",
+        "function": "y := y - x"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "StepX",
+        "guard": "x > y"
+    },
+    {
+        "src": "Check",
+        "tgt": "StepY",
+        "guard": "y > x"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "x == y"
+    },
+    {
+        "src": "StepX",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "StepY",
+        "tgt": "Check",
+        "guard": "True"
+    }
+]
+variables = ["x", "y", "a", "b", "init"]
+initial_step = "Init"

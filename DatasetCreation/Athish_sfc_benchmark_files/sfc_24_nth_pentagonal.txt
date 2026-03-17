@@ -1,0 +1,51 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "pent := 0; i := 1"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Add",
+        "function": "pent := pent + (3*i-2)"
+    },
+    {
+        "name": "Inc",
+        "function": "i := i+1"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Add",
+        "guard": "i <= n"
+    },
+    {
+        "src": "Add",
+        "tgt": "Inc",
+        "guard": "True"
+    },
+    {
+        "src": "Inc",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "i > n"
+    }
+]
+variables = ["pent", "i", "n", "init"]
+initial_step = "Init"

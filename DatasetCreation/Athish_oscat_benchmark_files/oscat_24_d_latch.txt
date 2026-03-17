@@ -1,0 +1,42 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "q := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Latch",
+        "function": "q := d"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Latch",
+        "guard": "enable == 1"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "enable == 0"
+    },
+    {
+        "src": "Latch",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["d", "enable", "q", "init"]
+initial_step = "Init"

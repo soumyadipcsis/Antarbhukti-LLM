@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "even := (n % 2 == 0)"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["even", "n", "init"]
+initial_step = "Init"

@@ -1,0 +1,51 @@
+(*@PROPERTIES_EX@
+TYPE: POU
+LOCALE: 0
+IEC_LANGUAGE: ST
+PLC_TYPE: independent
+PROC_TYPE: independent
+GROUP: LOGIC.GATE_LOGIC
+*)
+(*@KEY@:DESCRIPTION*)
+version 1.1	16. mar. 2008
+programmer 	hugo
+tested by	tobias
+
+this Function Block extracts the 8 Bits from a byte
+(*@KEY@:END_DESCRIPTION*)
+FUNCTION_BLOCK BYTE_TO_BITS
+
+(*Group:Default*)
+
+
+VAR_INPUT
+	IN :	BYTE;
+END_VAR
+
+
+VAR_OUTPUT
+	B0 :	BOOL;
+	B1 :	BOOL;
+	B2 :	BOOL;
+	B3 :	BOOL;
+	B4 :	BOOL;
+	B5 :	BOOL;
+	B6 :	BOOL;
+	B7 :	BOOL;
+END_VAR
+
+
+(*@KEY@: WORKSHEET
+NAME: BYTE_TO_BITS
+IEC_LANGUAGE: ST
+*)
+B0 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),0); (* IN.X0 *)
+B1 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),1); (* IN.X1 *)
+B2 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),2); (* IN.X2 *)
+B3 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),3); (* IN.X3 *)
+B4 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),4); (* IN.X4 *)
+B5 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),5); (* IN.X5 *)
+B6 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),6); (* IN.X6 *)
+B7 := BIT_OF_DWORD(BYTE_TO_DWORD(IN),7); (* IN.X7 *)
+(*@KEY@: END_WORKSHEET *)
+END_FUNCTION_BLOCK

@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "diff := a - b"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["diff", "a", "b", "init"]
+initial_step = "Init"

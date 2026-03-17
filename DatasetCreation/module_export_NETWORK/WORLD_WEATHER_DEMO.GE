@@ -1,0 +1,366 @@
+(*@PROPERTIES_EX@
+TYPE: POU
+LOCALE: 0
+IEC_LANGUAGE: FBD
+PLC_TYPE: independent
+PROC_TYPE: independent
+GROUP: DEMO
+*)
+(*@KEY@:DESCRIPTION*)
+
+CASE state OF 
+00: (* auf positive Flanke SET warten *)
+  IF SET AND NOT SET_LAST THEN
+    state := 10;
+    TP := FALSE;
+	TOTAL_SIZE := 0;
+	HTTP_SIZE := 0;
+	HTTP_STATUS := '';
+    ERROR := BYTE#0;
+
+    (*####################  DEBUG-MESSAGE  ###################################*)
+    IF LOG_CONTROL.bo_Debug THEN
+      LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S00 START /IP_ID ~4';
+      LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+      LOG_MESSAGE();
+    END_IF;
+    (*########################################################################*)
+
+  END_IF;
+
+10: (* Bei IP_Control anmelden *)
+  IP_FIFO(FIFO:=IPC.FIFO,COM:=BYTE#1,IP_ID:=IP_ID);
+  IPC.FIFO:=IP_FIFO.FIFO;
+  IP_ID:=IP_FIFO.IP_ID;
+
+  IF IP_FIFO.DONE THEN
+    (*####################  DEBUG-MESSAGE  ###################################*)
+    IF LOG_CONTROL.bo_Debug THEN
+      LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S10 FIFO ADD OK /IP_ID ~4';
+      LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+      LOG_MESSAGE();
+    END_IF;
+    (*########################################################################*)
+    state := 20; 
+  END_IF;
+
+20: (* Warten auf freien Kanal *)
+  IP_FIFO(FIFO:=IPC.FIFO,COM:=BYTE#2,IP_ID:=IP_ID);
+  IPC.FIFO:=IP_FIFO.FIFO;
+  IP_ID:=IP_FIFO.IP_ID;
+
+  IF IP_FIFO.DONE THEN
+
+    (* krücke für pcworx -> kein $0D$0A im String möglich *)
+    DELIMITER := CONCAT(BYTE_TO_STRING(BYTE#16#0D,'%c'),BYTE_TO_STRING(BYTE#16#0A,'%c'));
+
+	text := CONCAT('GET ',URL_DATA.PATH);
+
+    IF LEN(URL_DATA.QUERY) > 0 THEN
+	  text := CONCAT(text,'?');
+	  text := CONCAT(text,URL_DATA.QUERY);
+	END_IF;
+
+    text := CONCAT(text,' HTTP/1.1');
+    text := CONCAT(text,DELIMITER);
+    text := CONCAT(text,'Host: ');
+    text := CONCAT(text,URL_DATA.DOMAIN);
+    text := CONCAT(text,DELIMITER);
+    text := CONCAT(text,'Connection: Keep-Alive');
+    text := CONCAT(text,DELIMITER);
+    text := CONCAT(text,DELIMITER);
+
+    i2 := LEN(TEXT);
+    FOR i := 1 TO i2 DO
+      S_BUF.DATA[i] := INT_TO_BYTE(GET_CHAR(text,i));
+    END_FOR;
+
+    state := 30;
+
+    (* IP Datenverkehr einrichten *) 
+    IPC.C_PORT   := WORD#80;     (* Portnummer eintragen                          *)
+    IPC.C_IP     := IP4;         (* IP eintragen                                  *)
+    IPC.C_MODE   := BYTE#0;      (* Mode: TCP/AKTIV                               *)
+    IPC.C_ENABLE := TRUE;        (* Verbindungsaufbau freigeben                   *)
+    S_BUF.COUNT  := i2;          (* Sendelänge eintragen                          *)
+    R_BUF.COUNT  := 0;           (* Empfangslänge rücksetzen                      *) 
+
+    (*####################  DEBUG-MESSAGE  ###################################*)
+    IF LOG_CONTROL.bo_Debug THEN
+      LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S20 SEND /IP_ID ~4';
+      LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+      LOG_MESSAGE();
+    END_IF;
+    (*########################################################################*)
+
+  END_IF;
+
+30:
+  IF IPC.C_TIME_ERROR OR IPC.S_TIME_ERROR OR IPC.R_TIME_ERROR AND FALSE THEN  (* Connect/Send/Receive Timeout Error *)
+    ERROR := BYTE#255;           (* Timeout            *)
+  END_IF;
+  
+  IF TOTAL_SIZE = 0 THEN
+    IF R_BUF.COUNT > 15 THEN;  (* länge der empfangenen Daten prüfen *)
+
+      search := CONCAT(DELIMITER,DELIMITER);
+
+      (* HTTP HEADER Ende suchen -> durch $0D$A$0D$A erkennbar                              *)
+      BUFFER_SEARCH_IPC(size:=INT_TO_UINT(R_BUF.COUNT),str:=search,pos:=1,ign:=BYTE#00,pt:=R_BUF.DATA);
+      R_BUF.DATA:=BUFFER_SEARCH_IPC.pt;
+
+      IF BUFFER_SEARCH_IPC.BUFFER_SEARCH > 0 THEN
+        HTTP_SIZE := BUFFER_SEARCH_IPC.BUFFER_SEARCH +3;
+      END_IF;
+
+      (*####################  DEBUG-MESSAGE  ###################################*)
+      IF LOG_CONTROL.bo_Debug THEN
+        LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S20 HEADER_SIZE ~1 /IP_ID ~4';
+        LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+        LOG_CONTROL.sta_PRINTF[1]  := INT_TO_STRING(HTTP_SIZE,'%d');
+        LOG_MESSAGE();
+      END_IF;
+      (*########################################################################*)
+
+      (* HTML Statuscode auswerten steht immer am beginn *)
+      READ_HTML_LINE(size:=INT_TO_UINT(HTTP_SIZE),pos:=1,pt:=R_BUF.DATA);
+      R_BUF.DATA:=READ_HTML_LINE.pt;
+      i := LEN(READ_HTML_LINE.READ_HTML_LINE);
+      IF i>12 THEN
+        (* Code und Meldung isolieren *)
+        HTTP_STATUS := RIGHT(READ_HTML_LINE.READ_HTML_LINE,i-9);      
+      END_IF;
+
+      (* positive HTTP Anfrage ? *)
+      IF FIND(HTTP_STATUS,'200') > 0 THEN
+
+        (* Versuch den Eintrag zu lesen: Content-Length  *)
+        BUFFER_SEARCH_IPC(size:=INT_TO_UINT(HTTP_SIZE),str:='Content-Length: ',pos:=1,ign:=BYTE#00,pt:=R_BUF.DATA);
+        R_BUF.DATA:=BUFFER_SEARCH_IPC.pt;
+        i2:=BUFFER_SEARCH_IPC.BUFFER_SEARCH;
+
+        IF i2 > 0 THEN
+          (* 'Content-Length: Wert einlesen auswerten *)
+          READ_HTML_LINE(size:=INT_TO_UINT(HTTP_SIZE),pos:=i2,pt:=R_BUF.DATA);
+          R_BUF.DATA:=READ_HTML_LINE.pt;
+          text2:=READ_HTML_LINE.READ_HTML_LINE;
+          i := LEN(text2);
+          IF i > 16 THEN
+            text2 := RIGHT(text2,i-16);
+
+            IS_ALNUM(str:=text2,EXT_ASCII:=FALSE);
+            IF IS_ALNUM.IS_ALNUM THEN
+              (* erwartete gesamtmenge an Bytes berechnen *)
+              TOTAL_SIZE := STRING_TO_INT(text2)+ HTTP_SIZE;
+
+              (*####################  DEBUG-MESSAGE  ###################################*)
+              IF LOG_CONTROL.bo_Debug THEN
+                LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S20 TOTAL_SIZE ~1 /IP_ID ~4';
+                LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+                LOG_CONTROL.sta_PRINTF[1]  := INT_TO_STRING(TOTAL_SIZE,'%d');
+                LOG_MESSAGE();
+              END_IF;
+              (*########################################################################*)
+		    END_IF;
+          ELSE
+            ERROR := BYTE#252; (* ungültige Content-Length *) 
+		  END_IF;
+        ELSE
+   	      ERROR := BYTE#253; (* Content-Length nicht gefunden *) 
+        END_IF;
+      ELSE
+	    ERROR := BYTE#254; (* Fehler durch HTTP-Statuscodes *) 
+      END_IF;
+    END_IF;
+  ELSIF TOTAL_SIZE >= R_BUF.COUNT THEN
+    TP := TRUE;
+  END_IF;
+
+  
+  (* Ende ? *)
+  IF TP OR ERROR > BYTE#0 THEN
+    IPC.C_ENABLE := FALSE;   (* Verbindungsaufbau sperren           *)
+    state := 40;
+  END_IF;
+
+  IF TP THEN  
+    (*####################  DEBUG-MESSAGE  ###################################*)
+    IF LOG_CONTROL.bo_Debug THEN
+      LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S30 OK /IP_ID ~4';
+      LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+      LOG_MESSAGE();
+    END_IF;
+    (*########################################################################*)
+  END_IF;
+
+  (*####################  DEBUG-MESSAGE  ###################################*)
+  IF ERROR > BYTE#0 THEN
+    IF LOG_CONTROL.bo_Debug THEN
+      LOG_CONTROL.st_New_Message := STRING#'~S HTTP: S30 ERROR C~1/S~2/R~3 /IP_ID ~4';
+      LOG_CONTROL.sta_PRINTF[1]  := INT_TO_STRING(BOOL_TO_INT(IPC.C_TIME_ERROR),'%d');
+      LOG_CONTROL.sta_PRINTF[2]  := INT_TO_STRING(BOOL_TO_INT(IPC.S_TIME_ERROR),'%d');
+      LOG_CONTROL.sta_PRINTF[3]  := INT_TO_STRING(BOOL_TO_INT(IPC.R_TIME_ERROR),'%d');
+      LOG_CONTROL.sta_PRINTF[4]  := BYTE_TO_STRING(IP_ID,'%u');
+      LOG_MESSAGE();
+    END_IF;
+  END_IF;
+  (*########################################################################*)
+
+40: (* Verbindung beendet -> IP_ID vom Stack nehmen *)
+  IF NOT IPC.C_READY THEN
+    state := 00;
+    IP_FIFO(FIFO:=IPC.FIFO,COM:=BYTE#3,IP_ID:=IP_ID);
+    IPC.FIFO:=IP_FIFO.FIFO;
+    IP_ID:=IP_FIFO.IP_ID;
+  END_IF;
+END_CASE;
+
+SET_LAST := SET; (* letzten Status sichern zur Flankenerkennung *)
+(*@KEY@:END_DESCRIPTION*)
+PROGRAM WORLD_WEATHER_DEMO
+
+(*Group:Default*)
+
+
+VAR
+	IP_CONTROL_1 :	IP_CONTROL;
+	S_BUF :	oscat_NETWORK_BUFFER;
+	R_BUF :	oscat_NETWORK_BUFFER;
+	IP_C :	oscat_IP_C;
+	WORLD_WEATHER :	WORLD_WEATHER;
+	WW_DATA :	oscat_WORLD_WEATHER_DATA;
+	CLK_PRG :	CLK_PRG;
+	WORLD_WEATHER_DESC_GE :	WORLD_WEATHER_DESC_GE;
+	WORLD_WEATHER_ICON_OSCAT :	WORLD_WEATHER_ICON_OSCAT;
+	done :	BOOL;
+	error_t :	BYTE;
+	error_c :	DWORD;
+	activate :	BOOL;
+	busy :	BOOL;
+	latitude :	REAL := 48.21;
+	longitude :	REAL := 16.37;
+END_VAR
+
+
+(*@KEY@: WORKSHEET
+NAME: WORLD_WEATHER_DEMO
+IEC_LANGUAGE: FBD
+*)
+[GRA]
+400 400 0 0 0 0 0 
+
+[LIT]
+1
+53 101 74 101 0 ""
+
+[TET]
+43
+66 116 74 118 4 5 S_BUF
+66 120 74 122 4 5 R_BUF
+68 112 74 114 4 5 IP_C
+99 116 107 118 4 3 S_BUF
+99 120 107 122 4 3 R_BUF
+99 112 105 114 4 3 IP_C
+19 45 27 47 4 5 S_BUF
+19 49 27 51 4 5 R_BUF
+21 41 27 43 4 5 IP_C
+56 45 64 47 4 3 S_BUF
+56 49 64 51 4 3 R_BUF
+56 41 62 43 4 3 IP_C
+15 53 27 55 4 5 WW_DATA
+56 53 68 55 4 3 WW_DATA
+56 29 63 31 4 3 done
+56 33 65 35 4 3 error_c
+56 25 62 27 4 3 busy
+56 37 64 39 4 3 error_t
+18 25 27 27 4 5 activate
+67 108 74 110 4 5 T#5s
+21 100 30 102 4 5 BYTE#8
+21 104 30 106 4 5 BYTE#8
+21 108 30 110 4 5 BYTE#8
+21 112 30 114 4 5 BYTE#8
+26 92 69 95 65536 6 4 0 229 0 0 0 0 0 0 Tahoma 
+IP-Adresse des DNS-Server oder des DSL-Router
+3 37 27 39 4 5 '5c6ecef5cc131759100310'
+18 29 27 31 4 5 latitude
+17 33 27 35 4 5 longitude
+30 5 40 8 7 6 CLK_PRG
+22 11 28 13 4 5 t#3h
+41 11 50 13 4 3 activate
+21 74 28 76 4 5 done
+16 78 28 80 4 5 WW_DATA
+61 78 73 80 4 3 WW_DATA
+23 64 62 67 65536 6 4 0 229 0 0 0 0 0 0 Tahoma 
+Wetterbeschreibung auf Deutsch (optional)
+83 74 90 76 4 5 done
+78 78 90 80 4 5 WW_DATA
+127 78 139 80 4 3 WW_DATA
+85 64 121 67 65536 6 4 0 229 0 0 0 0 0 0 Tahoma 
+ICONS nach OSCAT-Standard (optional)
+92 68 125 71 7 6 WORLD_WEATHER_ICON_OSCAT
+30 68 59 71 7 6 WORLD_WEATHER_DESC_GE
+76 94 97 97 7 6 IP_CONTROL_1
+29 19 54 22 7 6 WORLD_WEATHER
+
+[FBS]
+6
+262176 196705 51 117 1 0 DWORD_OF_BYTE @  
+262174 196616 39 16 0 0 CLK_PRG CLK_PRG  
+786524 393287 125 83 0 0 WORLD_WEATHER_ICON_OSCAT WORLD_WEATHER_ICON_OSCAT  
+786462 393287 59 83 0 0 WORLD_WEATHER_DESC_GE WORLD_WEATHER_DESC_GE  
+786508 524385 97 125 0 0 IP_CONTROL IP_CONTROL_1  
+851997 720918 54 58 0 0 WORLD_WEATHER WORLD_WEATHER  
+
+[FPT]
+29
+32 100 37 102 B3 0 0 0 0 4224 0 @ BYTE 
+32 104 37 106 B2 0 0 0 0 4224 0 @ BYTE 
+32 108 37 110 B1 0 0 0 0 4224 0 @ BYTE 
+32 112 37 114 B0 0 0 0 0 4224 0 @ BYTE 
+50 100 51 102 DWORD_OF_BYTE 0 0 0 1 0 4736 @ DWORD 
+30 11 35 13 PT 0 0 0 0 4224 0 @ TIME 
+36 11 39 13 Q 0 0 0 1 0 4225 @ BOOL 
+92 74 105 76 ACTIVATE 0 0 0 0 4225 0 @ BOOL 
+92 78 125 80 WW 0 0 0 2 128 128 @ oscat_WORLD_WEATHER_DATA 
+30 74 43 76 ACTIVATE 0 0 0 0 4225 0 @ BOOL 
+30 78 59 80 WW 0 0 0 2 128 128 @ oscat_WORLD_WEATHER_DATA 
+76 100 81 102 IP 0 0 0 0 4224 0 @ DWORD 
+76 104 84 106 PORT 0 0 0 0 4224 0 @ WORD 
+76 108 89 110 TIME_OUT 0 0 0 0 4224 0 @ TIME 
+76 112 97 114 IP_C 0 0 0 2 128 128 @ oscat_IP_C 
+76 116 97 118 S_BUF 0 0 0 2 128 128 @ oscat_NETWORK_BUFFER 
+76 120 97 122 R_BUF 0 0 0 2 128 128 @ oscat_NETWORK_BUFFER 
+29 25 42 27 ACTIVATE 0 0 0 0 4225 0 @ BOOL 
+29 29 41 31 LATITUDE 0 0 0 0 4224 0 @ REAL 
+29 33 43 35 LONGITUDE 0 0 0 0 4224 0 @ REAL 
+29 37 36 39 KEY 0 0 0 0 4224 0 @ oscat_STRING30 
+47 25 54 27 BUSY 0 0 0 1 0 4225 @ BOOL 
+47 29 54 31 DONE 0 0 0 1 0 4225 @ BOOL 
+44 33 54 35 ERROR_C 0 0 0 1 0 4224 @ DWORD 
+43 37 54 39 ERROR_T 0 0 0 1 0 4224 @ BYTE 
+29 41 54 43 IP_C 0 0 0 2 128 128 @ oscat_IP_C 
+29 45 54 47 S_BUF 0 0 0 2 128 128 @ oscat_NETWORK_BUFFER 
+29 49 54 51 R_BUF 0 0 0 2 128 128 @ oscat_NETWORK_BUFFER 
+29 53 54 55 WW 0 0 0 2 128 128 @ oscat_WORLD_WEATHER_DATA 
+
+[AKT]
+0
+
+[STT]
+0
+
+[TRT]
+0
+
+[KOT]
+0
+
+[VER]
+0
+
+[IBX]
+0
+
+
+(*@KEY@: END_WORKSHEET *)
+END_PROGRAM

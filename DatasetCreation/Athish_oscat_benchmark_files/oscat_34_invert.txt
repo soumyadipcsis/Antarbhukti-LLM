@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "out := -input"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["input", "out", "init"]
+initial_step = "Init"

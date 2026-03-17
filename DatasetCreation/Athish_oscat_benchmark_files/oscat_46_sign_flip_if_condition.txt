@@ -1,0 +1,42 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "out := input"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Flip",
+        "function": "out := -input"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Flip",
+        "guard": "cond == 1"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "cond == 0"
+    },
+    {
+        "src": "Flip",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["input", "cond", "out", "init"]
+initial_step = "Init"

@@ -1,0 +1,37 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "max1 := a if a > b else b"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Max2",
+        "function": "max2 := max1 if max1 > c else c"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Max2",
+        "guard": "True"
+    },
+    {
+        "src": "Max2",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["a", "b", "c", "max1", "max2", "init"]
+initial_step = "Init"

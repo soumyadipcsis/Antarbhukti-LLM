@@ -1,0 +1,60 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "timer := 0; pulse := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "StartPulse",
+        "function": "pulse := 1; timer := 1"
+    },
+    {
+        "name": "Pulse",
+        "function": "timer := timer + 1"
+    },
+    {
+        "name": "StopPulse",
+        "function": "pulse := 0; timer := 0"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "StartPulse",
+        "guard": "trigger == 1"
+    },
+    {
+        "src": "StartPulse",
+        "tgt": "Pulse",
+        "guard": "True"
+    },
+    {
+        "src": "Pulse",
+        "tgt": "Pulse",
+        "guard": "timer < width"
+    },
+    {
+        "src": "Pulse",
+        "tgt": "StopPulse",
+        "guard": "timer >= width"
+    },
+    {
+        "src": "StopPulse",
+        "tgt": "Check",
+        "guard": "True"
+    }
+]
+variables = ["trigger", "timer", "width", "pulse", "init"]
+initial_step = "Init"

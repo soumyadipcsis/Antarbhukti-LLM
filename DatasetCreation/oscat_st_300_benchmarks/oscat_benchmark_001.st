@@ -1,0 +1,20 @@
+VAR
+    state : INT := 0;
+    x : BOOL;
+    y : BOOL;
+END_VAR
+
+CASE state OF
+0:
+    state := 5;
+1:
+    state := 0;
+2:
+    IF x AND y THEN state := 5;
+3:
+    IF x THEN state := 3;
+4:
+    IF NOT y THEN state := 3; ELSE state := 3;
+5:
+    state := 5;
+END_CASE

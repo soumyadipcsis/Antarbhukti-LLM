@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "quot := a // b"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["quot", "a", "b", "init"]
+initial_step = "Init"

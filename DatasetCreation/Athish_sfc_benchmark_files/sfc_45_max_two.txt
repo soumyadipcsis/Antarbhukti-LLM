@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "mx := a if a > b else b"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["mx", "a", "b", "init"]
+initial_step = "Init"

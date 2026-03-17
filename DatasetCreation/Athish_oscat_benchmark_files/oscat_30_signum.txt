@@ -1,0 +1,56 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "sgn := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "SetPos",
+        "function": "sgn := 1"
+    },
+    {
+        "name": "SetNeg",
+        "function": "sgn := -1"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "SetPos",
+        "guard": "input > 0"
+    },
+    {
+        "src": "Check",
+        "tgt": "SetNeg",
+        "guard": "input < 0"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "input == 0"
+    },
+    {
+        "src": "SetPos",
+        "tgt": "End",
+        "guard": "True"
+    },
+    {
+        "src": "SetNeg",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["input", "sgn", "init"]
+initial_step = "Init"

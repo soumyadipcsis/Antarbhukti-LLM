@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "c := (f - 32) * 5 / 9"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["c", "f", "init"]
+initial_step = "Init"

@@ -1,0 +1,25 @@
+```python
+steps2 = [{'name': 'WaitCall', 'function': 'MonitorFloorRequest'}, {'name': 'MoveLift', 'function': 'DriveToFloor'}, {'name': 'OpenDoor', 'function': 'UnlockDoors'}, {'name': 'SafetyWatchdog', 'function': 'CheckTimeouts'}, {'name': 'TimeoutSafeStop', 'function': 'ExecuteSafeStop'}, {'name': 'SafetyLog', 'function': 'LogSafetyEvent'}, {'name': 'SafeShutdown', 'function': 'ShutdownLift'}]
+transitions2 = [
+    {'src': 'WaitCall', 'tgt': 'MoveLift', 'guard': 'callReceived'},
+    # Modified: The SFC1 path from MoveLift to OpenDoor occurs when 'arrived' is true.
+    # To cover this, SFC2 must transition to OpenDoor if 'arrived' is true,
+    # prioritizing this over potential time-out conditions.
+    {'src': 'MoveLift', 'tgt': 'OpenDoor', 'guard': 'arrived'},
+    # Modified: The SFC1 path from OpenDoor to WaitCall occurs when 'doorClosed' is true.
+    # To cover this, SFC2 must transition to WaitCall if 'doorClosed' is true,
+    # prioritizing this over potential door time-out conditions.
+    {'src': 'OpenDoor', 'tgt': 'WaitCall', 'guard': 'doorClosed'},
+    # Modified: The SafetyWatchdog for MoveLift now only triggers if 'travel_time_exceeded'
+    # but the lift has NOT 'arrived', ensuring the primary 'arrived' path takes precedence.
+    {'src': 'MoveLift', 'tgt': 'SafetyWatchdog', 'guard': 'travel_time_exceeded and not arrived'},
+    # Modified: The SafetyWatchdog for OpenDoor now only triggers if 'door_time_exceeded'
+    # but the 'doorClosed' condition has NOT been met, ensuring the primary 'doorClosed' path takes precedence.
+    {'src': 'OpenDoor', 'tgt': 'SafetyWatchdog', 'guard': 'door_time_exceeded and not doorClosed'},
+    {'src': 'SafetyWatchdog', 'tgt': 'TimeoutSafeStop', 'guard': 'timeout_counter > threshold or watchdog_triggered'},
+    {'src': 'SafetyWatchdog', 'tgt': 'MoveLift', 'guard': 'watchdog_ok and not travel_time_exceeded'},
+    {'src': 'TimeoutSafeStop', 'tgt': 'SafetyLog', 'guard': 'true'},
+    {'src': 'SafetyLog', 'tgt': 'SafeShutdown', 'guard': 'log_complete'},
+    {'src': 'SafeShutdown', 'tgt': 'WaitCall', 'guard': 'manual_reset'}
+]
+```

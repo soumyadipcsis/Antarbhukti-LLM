@@ -1,0 +1,51 @@
+steps = [
+    {
+        "name": "Start",
+        "function": "i := 1; fact := 1"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Multiply",
+        "function": "fact := fact * i"
+    },
+    {
+        "name": "Increment",
+        "function": "i := i + 1"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Start",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Multiply",
+        "guard": "i <= n"
+    },
+    {
+        "src": "Multiply",
+        "tgt": "Increment",
+        "guard": "True"
+    },
+    {
+        "src": "Increment",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "i > n"
+    }
+]
+variables = ["i", "fact", "n", "init"]
+initial_step = "Start"

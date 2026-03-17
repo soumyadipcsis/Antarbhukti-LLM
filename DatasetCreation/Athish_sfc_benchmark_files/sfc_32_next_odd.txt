@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "next_odd := n + 1 if n % 2 == 0 else n + 2"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["next_odd", "n", "init"]
+initial_step = "Init"

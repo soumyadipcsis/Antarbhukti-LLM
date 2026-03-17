@@ -1,0 +1,51 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "cnt := max"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Count",
+        "function": "cnt := cnt - 1"
+    },
+    {
+        "name": "Reset",
+        "function": "cnt := max"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Count",
+        "guard": "input == 1 and cnt > 0"
+    },
+    {
+        "src": "Count",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "Reset",
+        "guard": "reset == 1"
+    },
+    {
+        "src": "Reset",
+        "tgt": "Check",
+        "guard": "True"
+    }
+]
+variables = ["input", "reset", "cnt", "max", "init"]
+initial_step = "Init"

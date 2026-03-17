@@ -1,0 +1,74 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "num := n"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Step",
+        "function": "s := 0"
+    },
+    {
+        "name": "SumDigits",
+        "function": "s := s + num%10; num := num//10"
+    },
+    {
+        "name": "LoopCheck",
+        "function": ""
+    },
+    {
+        "name": "Recur",
+        "function": "num := s"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Step",
+        "guard": "num >= 10"
+    },
+    {
+        "src": "Step",
+        "tgt": "SumDigits",
+        "guard": "num > 0"
+    },
+    {
+        "src": "SumDigits",
+        "tgt": "Step",
+        "guard": "num > 0"
+    },
+    {
+        "src": "SumDigits",
+        "tgt": "LoopCheck",
+        "guard": "num == 0"
+    },
+    {
+        "src": "LoopCheck",
+        "tgt": "Recur",
+        "guard": "s >= 10"
+    },
+    {
+        "src": "LoopCheck",
+        "tgt": "End",
+        "guard": "s < 10"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "num < 10"
+    }
+]
+variables = ["num", "s", "n", "init"]
+initial_step = "Init"

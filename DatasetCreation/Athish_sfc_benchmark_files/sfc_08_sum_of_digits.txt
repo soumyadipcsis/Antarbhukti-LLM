@@ -1,0 +1,42 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "s := 0; num := n"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Step",
+        "function": "s := s + num%10; num := num//10"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Step",
+        "guard": "num > 0"
+    },
+    {
+        "src": "Step",
+        "tgt": "Check",
+        "guard": "True"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "num == 0"
+    }
+]
+variables = ["s", "num", "n", "init"]
+initial_step = "Init"

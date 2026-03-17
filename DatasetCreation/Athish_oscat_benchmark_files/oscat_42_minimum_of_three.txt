@@ -1,0 +1,37 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "min1 := a if a < b else b"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Min2",
+        "function": "min2 := min1 if min1 < c else c"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Min2",
+        "guard": "True"
+    },
+    {
+        "src": "Min2",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["a", "b", "c", "min1", "min2", "init"]
+initial_step = "Init"

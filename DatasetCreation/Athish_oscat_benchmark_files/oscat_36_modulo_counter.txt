@@ -1,0 +1,42 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "count := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Inc",
+        "function": "count := (count + 1) % mod"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Inc",
+        "guard": "enable == 1"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "enable == 0"
+    },
+    {
+        "src": "Inc",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["enable", "mod", "count", "init"]
+initial_step = "Init"

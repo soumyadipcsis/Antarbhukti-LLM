@@ -1,0 +1,42 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "count := 0"
+    },
+    {
+        "name": "Check",
+        "function": ""
+    },
+    {
+        "name": "Dec",
+        "function": "count := count - 1"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "Check",
+        "guard": "init"
+    },
+    {
+        "src": "Check",
+        "tgt": "Dec",
+        "guard": "cond == 1"
+    },
+    {
+        "src": "Check",
+        "tgt": "End",
+        "guard": "cond == 0"
+    },
+    {
+        "src": "Dec",
+        "tgt": "End",
+        "guard": "True"
+    }
+]
+variables = ["cond", "count", "init"]
+initial_step = "Init"

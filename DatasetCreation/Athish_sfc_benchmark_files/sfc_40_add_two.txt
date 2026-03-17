@@ -1,0 +1,19 @@
+steps = [
+    {
+        "name": "Init",
+        "function": "sum := a + b"
+    },
+    {
+        "name": "End",
+        "function": ""
+    }
+]
+transitions = [
+    {
+        "src": "Init",
+        "tgt": "End",
+        "guard": "init"
+    }
+]
+variables = ["sum", "a", "b", "init"]
+initial_step = "Init"
