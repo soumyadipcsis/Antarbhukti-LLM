@@ -1,0 +1,55 @@
+You are an expert in control software design using IEC 61131-3 Sequential Function Charts (SFCs).
+
+[The Domain]
+Sequential Function Charts (SFCs) are graphical programming languages used in PLCs. An SFC consists of:
+- Steps: States in the control process, each with associated actions/functions.
+- Transitions: Conditions that cause movement from one step to another.
+- Guards: Boolean conditions that enable transitions.
+- Variables: Input/output and internal variables used in the control logic.
+
+[The Task]
+Your task is to take an initial SFC as input and generate a precise "When/Action" logic prompt, followed by the upgraded SFC that implements those exact rules to improve system [TARGET_DOMAIN: Safety OR Reliability].
+
+[Input SFC]
+<SFC_initial>
+{INSERT_JSON_HERE}
+</SFC_initial>
+
+[Upgrade Library]
+Select EXACTLY ONE or TWO distinct rules from the appropriate category below. DO NOT apply more than two rules. 
+
+If [TARGET_DOMAIN] is Reliability:
+1. Input Validation: (When: Input out of range -> Action: ValidateInput step -> ValidationError state).
+2. Execution Bounds: (When: Loop exceeds max iterations -> Action: Track count -> SafeAbort state).
+3. Intermediate Logging: (When: Critical transition occurs -> Action: Insert Log step to record state).
+4. Watchdog Monitoring: (When: Variable becomes undefined -> Action: WatchdogCheck -> WatchdogError).
+
+If [TARGET_DOMAIN] is Safety:
+1. Safety Input Check: (When: Safety-critical input missing/OOB -> Action: SafetyCheckInput -> SafetyError halt).
+2. Timeout Safe Stop: (When: Actuation exceeds safe time limit -> Action: Timeout check -> TimeoutSafeStop).
+3. Safe State Logging: (When: After safety-relevant cycle -> Action: SafetyLog step recording margins).
+
+[Strict Dataset Pipeline Rules]
+1. Exact Quantity: Generate a maximum of 2 "When/Action" rules.
+2. Additive Minimal Disruption (Anti-Collision): You must NEVER delete, restructure, or contradict the existing logic or existing safety guards. You may only ADD new guards, parallel branches, or fallback steps. 
+3. No Code Truncation (Anti-Explosion): You must output the ENTIRE, complete JSON. NEVER use placeholders, ellipses, or comments like "// rest of code". ABSOLUTELY NO COMMENTS are allowed anywhere inside the JSON output (do not use // or /* */).
+4. SFC Semantics: Transitions must be deterministic. Guards must be side-effect-free (no variable assignments in guards). Every new step must have a valid exit transition.
+5. Contextualize the Prompt. Do NOT copy and paste the text from the Upgrade Library. Your <NL_upgradation_prompt> MUST be a detailed, descriptive sentence using the exact specific variable names found in the provided SFC.
+6. Distinct Upgrades. The provided SFC may already contain safety or reliability logic. You MUST evaluate the existing steps and choose an upgrade from the library that does NOT duplicate an existing check (e.g., do not add a Watchdog if a Watchdog already exists).
+
+[Output Format Expectations]
+Provide exactly two outputs. Do NOT wrap the JSON in markdown code blocks (```) inside the XML tags. Output raw text and raw JSON only.
+
+<NL_upgradation_prompt>
+When: [trigger condition]
+Action: [specific structural change]
+</NL_upgradation_prompt>
+
+<SFC_upgraded>
+{
+  "steps": [ ... ],
+  "transitions": [ ... ],
+  "variables": [ ... ],
+  "initial_step": "StepName"
+}
+</SFC_upgraded>

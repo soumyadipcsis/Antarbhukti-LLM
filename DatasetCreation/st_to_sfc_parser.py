@@ -166,15 +166,31 @@ class _Tok:
             ch = self.text[self.pos]
             self.pos += 1
             buf.append(ch)
+            
             if ch == ';':
                 return _norm(''.join(buf))
-            so_far = ''.join(buf).strip().upper()
+            
+            # Use raw string without stripping spaces to maintain exact rollback lengths
+            raw_str = ''.join(buf).upper()
+            
             for kw in ('ELSIF', 'ELSE', 'END_IF', 'END_CASE', 'CASE', 'IF'):
-                if so_far.endswith(kw):
-                    rollback = len(kw)
-                    self.pos -= rollback
-                    buf = buf[:-rollback]
-                    return _norm(''.join(buf))
+                if raw_str.endswith(kw):
+                    # Word boundary check: Is this a distinct keyword, 
+                    # or just the end of a variable like 'SHIFT' or 'DIF'?
+                    is_distinct = False
+                    if len(raw_str) == len(kw):
+                        is_distinct = True
+                    else:
+                        prev_char = raw_str[-len(kw)-1]
+                        if not (prev_char.isalnum() or prev_char == '_'):
+                            is_distinct = True
+                            
+                    if is_distinct:
+                        rollback = len(kw)
+                        self.pos -= rollback
+                        buf = buf[:-rollback]
+                        return _norm(''.join(buf))
+                        
         return _norm(''.join(buf))
 
 

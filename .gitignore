@@ -184,3 +184,23 @@ uploads/
 
 #securing secrets
 src/antarbhukti/config.json
+
+# ==============================================================================
+# Antarbhukti Dataset Exclusions
+# ==============================================================================
+
+# Exclude OSCAT imports dependency folder
+DatasetCreation/OSCAT_imports/
+
+# Exclude baseline seeds and raw generation layers
+DatasetCreation/UpgradesGeneration/ALLSEEDS/
+DatasetCreation/UpgradesGeneration/layer1/
+DatasetCreation/UpgradesGeneration/layer2/
+DatasetCreation/UpgradesGeneration/upgraded_sfcs/
+
+# Exclude finalized and processed datasets
+DatasetCreation/UpgradesGeneration/final_dataset/
+DatasetCreation/UpgradesGeneration/filtered_final_dataset/
+
+# Exclude all OpenAI/Claude batch request and response JSONL files globally
+*.jsonl
