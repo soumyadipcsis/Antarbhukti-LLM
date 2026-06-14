@@ -42,10 +42,15 @@ def savefile(filename, content):
     """
     f = os.path.normpath(filename)
     d = os.path.dirname(filename)
-    if d and not os.path.exists(d):
-        os.makedirs(d, exist_ok=True)
-    with open(filename, 'w') as f:
-        f.write(content)
+    try:
+        if d and not os.path.exists(d):
+            os.makedirs(d, exist_ok=True)
+        with open(filename, 'w') as f:
+            f.write(content)
+        return True
+    except Exception as e:
+        print("         Save ERROR : {}".format(e))
+        return False
 
 
 def readfiles(root_directory):
