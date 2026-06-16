@@ -1,20 +1,20 @@
 steps = [
-{"name": "Idle", "function": "WaitRequest"},
-{"name": "SafetyCheckInput", "function": "ValidateInputs()"},
-{"name": "SafetyError", "function": "LogAndHalt()"},
-{"name": "MoveUp", "function": "ElevatorUp"},
-{"name": "MoveDown", "function": "ElevatorDown"},
-{"name": "OpenDoor", "function": "OpenDoors"}
+    {"name": "Idle", "function": "WaitRequest"},
+    {"name": "SafetyCheckInput", "function": "ValidateInputs()"},
+    {"name": "SafetyError", "function": "LogAndHalt()"},
+    {"name": "MoveUp", "function": "ElevatorUp"},
+    {"name": "MoveDown", "function": "ElevatorDown"},
+    {"name": "OpenDoor", "function": "OpenDoors"}
 ]
 
 transitions = [
-{"src": "Idle", "tgt": "SafetyCheckInput", "guard": "requestedFloor != currentFloor"},
-{"src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "inputsValid == False"},
-{"src": "SafetyCheckInput", "tgt": "MoveUp", "guard": "inputsValid == True and requestedFloor > currentFloor"},
-{"src": "SafetyCheckInput", "tgt": "MoveDown", "guard": "inputsValid == True and requestedFloor < currentFloor"},
-{"src": "MoveUp", "tgt": "OpenDoor", "guard": "currentFloor == requestedFloor"},
-{"src": "MoveDown", "tgt": "OpenDoor", "guard": "currentFloor == requestedFloor"},
-{"src": "OpenDoor", "tgt": "Idle", "guard": "doorTimerElapsed == true"}
+    {"src": "Idle", "tgt": "SafetyCheckInput", "guard": "TRUE"},
+    {"src": "SafetyCheckInput", "tgt": "SafetyError", "guard": "FALSE"},
+    {"src": "SafetyCheckInput", "tgt": "MoveUp", "guard": "TRUE AND requestedFloor"},
+    {"src": "SafetyCheckInput", "tgt": "MoveDown", "guard": "TRUE"},
+    {"src": "MoveUp", "tgt": "OpenDoor", "guard": "TRUE"},
+    {"src": "MoveDown", "tgt": "OpenDoor", "guard": "TRUE"},
+    {"src": "OpenDoor", "tgt": "Idle", "guard": "TRUE"}
 ]
 
 variables = ['currentFloor', 'requestedFloor', 'doorTimerElapsed', 'inputsValid']
