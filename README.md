@@ -4,6 +4,7 @@ AntarBhukti is a verification tool for evolving software, designed to verify cha
 # For SEFM 2026 
  DOI: 10.5281/zenodo.21470241
  https://zenodo.org/records/21470241
+ https://doi.org/10.5281/zenodo.21470241
 
 ## Features
 
