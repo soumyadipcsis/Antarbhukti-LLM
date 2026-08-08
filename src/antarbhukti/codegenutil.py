@@ -167,19 +167,22 @@ def read_config_file(config_path: str):
 
 def parse_args():
     """
-    Parse command line arguments for SFC code generation
+    Parse command line arguments for SFC code generation and verification.
     
     Returns:
         argparse.Namespace: Parsed command line arguments
     """
-    parser = argparse.ArgumentParser(description="SFC code upgradation and refinement tool")
+    parser = argparse.ArgumentParser(description="SFC code verification and refinement tool")
     parser.add_argument("--src_path", help="Source code file or directory", required=True)
     parser.add_argument("--mod_path", required=True, help="Upgraded file or directory")
     parser.add_argument("--result_root", default="output", help="Root directory for result files")
-    parser.add_argument("--prompt_path", required=True, help="Prompt file for refinement")
+    parser.add_argument("--prompt_path", default=None, help="Prompt file for refinement")
     parser.add_argument("--config_path", default="config.json", help="Configuration file path- defaults to 'config.json'")
-    parser.add_argument("--llms", required=True, help="Choose LLMs (comma-separated)")
-    args= parser.parse_args()
+    parser.add_argument("--llms", default=None, help="Choose LLMs (comma-separated)")
+    parser.add_argument("--step0", action="store_true", help="Run Step 0 automated verification without LLM")
+    parser.add_argument("--output_excel", default="verification_results.xlsx", help="Excel output file for verification results")
+    args = parser.parse_args()
+    
     # Validate source file
     if not (os.path.isfile(args.src_path) or os.path.isdir(args.src_path)):
         parser.error(f"Source file '{args.src_path}' does not exist or is not a file.")
@@ -189,14 +192,16 @@ def parse_args():
     # Validate result root directory
     if not os.path.isdir(args.result_root):
         os.makedirs(args.result_root, exist_ok=True)
-        print(f"Result root directory '{args.result_root}' does not exist. Creating one..")   
-    # Validate prompt file
-    if not os.path.isfile(args.prompt_path):
-        parser.error(f"Prompt file '{args.prompt_path}' does not exist or is not a file.")
-    # Validate config file
-    if not os.path.isfile(args.config_path):
-        parser.error(f"Configuration file '{args.config_path}' does not exist or is not a file.")
-    # Validate LLMs argument
-    if not args.llms:
-        parser.error("You must specify at least one LLM using the --llms argument.")
+        print(f"Result root directory '{args.result_root}' does not exist. Creating one..")
+
+    # If --step0 is NOT set, require prompt_path, config_path, and llms
+    if not args.step0:
+        if not args.prompt_path or not os.path.isfile(args.prompt_path):
+            parser.error(f"Prompt file '{args.prompt_path}' does not exist or is not a file.")
+        if not os.path.isfile(args.config_path):
+            parser.error(f"Configuration file '{args.config_path}' does not exist or is not a file.")
+        if not args.llms:
+            parser.error("You must specify at least one LLM using the --llms argument when not running --step0.")
+            
     return args
+
